@@ -17,18 +17,15 @@ def animate_automata(states: Iterator[np.array], steps: int, timestep: int):
     NB. This function is blocking.
     """
     initial_state = next(states)
-    size = steps, initial_state.size
-
+    state_length = initial_state.size
+    size = steps, state_length
     x = np.zeros(size)
-    # x[0][:] = 1  # This is the ugly work around.
-    x[0] = initial_state
 
     fig = plt.figure()
-    # ax = plt.axes()
     ax = fig.add_subplot(111)
     ax.get_xaxis().set_visible(False)
     ax.get_yaxis().set_visible(False)
-    img_data_handler = ax.imshow(x, cmap="Greys", interpolation="none")
+    img_data_handler = ax.imshow(x, vmin=0, vmax=1, cmap="Greys", interpolation="none")
     plt.tight_layout()
 
     def init():
@@ -65,6 +62,7 @@ def self_biasing_random_states(size):
     # Loop over new state and update p.
     while True:
         p = sum(current_state) / size
+        p += (-1 if p > 0.5 else 1) * 0.01
         current_state = np.random.binomial(1, p, size)
         yield current_state
 
