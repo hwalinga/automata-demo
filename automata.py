@@ -12,7 +12,7 @@ matplotlib.use("TkAgg")
 # Interesting ones: 30, 90, 110, 184
 def get_rule(rule_num: int) -> dict:
     scaffold = ["111", "110", "101", "100", "011", "010", "001", "000"]
-    binary = str(bin(rule_num))[2:].zfill(8)
+    binary = format(rule_num, '08b')
     return dict(zip(scaffold, binary))
 
 
