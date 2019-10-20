@@ -1,3 +1,5 @@
+import sys
+
 import matplotlib
 import matplotlib.animation as animation
 import matplotlib.pyplot as plt
@@ -5,21 +7,13 @@ import numpy as np
 
 matplotlib.use("TkAgg")
 
-# define some interesting rules
-RULES = \
-    {
-        30: {"111": '0', "110": '0', "101": '0', "000": '0',
-             "100": '1', "011": '1', "010": '1', "001": '1'},
 
-        90: {"111": "0", "110": "1", "101": "0", "100": "1",
-             "011": "1", "010": "0", "001": "1", "000": "0"},
-
-        110: {"111": '0', "110": '1', "101": '1', "100": '0',
-              "011": '1', "010": '1', "001": '1', "000": '0'},
-
-        184: {"111": "1", "110": "0", "101": "1", "100": "1",
-              "011": "1", "010": "0", "001": "0", "000": "0"}
-    }
+# define rule creator
+# Interesting ones: 30, 90, 110, 184
+def get_rule(rule_num: int) -> dict:
+    scaffold = ["111", "110", "101", "100", "011", "010", "001", "000"]
+    binary = str(bin(rule_num))[2:].zfill(8)
+    return dict(zip(scaffold, binary))
 
 
 class Automata:
@@ -46,7 +40,7 @@ class Automata:
         # initialize current state
         self.current_state = np.zeros(size, dtype=int)
         # self.current_state[int(np.round(self.size / 2))] = int(1)
-        self.current_state = self.get_self_biasing_random()
+        self.current_state = np.random.binomial(1, 0.5, self.size)
 
         # initialize data and image frame
         self.x = np.zeros((self.steps, self.size))
@@ -56,7 +50,9 @@ class Automata:
         self.ax.get_yaxis().set_visible(False)
         plt.tight_layout()
 
-        self.image = self.ax.imshow(self.x, vmin=0, vmax=1, cmap="Greys", interpolation="none")
+        self.image = self.ax.imshow(
+            self.x, vmin=0, vmax=1, cmap="Greys", interpolation="none"
+        )
 
     def get_self_biasing_random(self):
         """
@@ -75,13 +71,15 @@ class Automata:
         """
 
         # Apply rolling window over state (size 3, because only rule 0-255 are implemented currently)
-        windows = list(self._window(3))
+        windows = self._window(3)
 
         # compute update for every cell in state and concat to string
-        new_state = ','.join(self.rule[np.array2string(pat, separator='')[1:-1]] for pat in windows)
+        new_state = ",".join(
+            self.rule[np.array2string(pat, separator="")[1:-1]] for pat in windows
+        )
 
         # create numpy array from string resulting in new state
-        self.current_state = np.fromstring(new_state, sep=',', dtype=int)
+        self.current_state = np.fromstring(new_state, sep=",", dtype=int)
 
     def _window(self, stride=3):
         """
@@ -96,7 +94,7 @@ class Automata:
 
         # use rolling window to generate all subarrays.
         for index in range(len(padded) - stride + 1):
-            yield padded[index:index + stride]
+            yield padded[index : index + stride]
 
     def animate(self, frames=None):
         """
@@ -105,7 +103,13 @@ class Automata:
         """
 
         anim = animation.FuncAnimation(
-            self.fig, self._animate, init_func=self._init_animator, interval=self.timestep, blit=True, frames=frames, repeat=False
+            self.fig,
+            self._animate,
+            init_func=self._init_animator,
+            interval=self.timestep,
+            blit=True,
+            frames=frames,
+            repeat=False,
         )
         return anim
 
@@ -114,7 +118,7 @@ class Automata:
         Method to initialize the first data of the animation object.
         :return: Iterable containing initial data.
         """
-        self.image.set_data(self.x)
+        # self.image.set_data(self.x)
         return [self.image]
 
     def _animate(self, i):
@@ -141,18 +145,18 @@ class Automata:
         return [self.image]
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     """
     Main method used to simulate the CAs
     """
 
     # create automata with certain rule, window height and width and update speed
-    automaat = Automata(RULES[90], 512, 512, 2)
+    rule = get_rule(int(sys.argv[1]) if len(sys.argv) > 1 else 110)
+    automaat = Automata(rule, 512, 512, 1)
 
     # simulate rule, specify frames to set video record duration (duration is frames/fps seconds)
     # use None for continuous animation (video stops after certain amount of frames by default)
     anim = automaat.animate(frames=None)
-
 
     # functions used to save simulation to video
     # file_location = "demo_videos/animation.mp4"
