@@ -1,4 +1,5 @@
 import sys
+from itertools import product
 
 import matplotlib
 import matplotlib.animation as animation
@@ -11,8 +12,8 @@ matplotlib.use("TkAgg")
 # define rule creator
 # Interesting ones: 30, 90, 110, 184
 def get_rule(rule_num: int) -> dict:
-    scaffold = ["111", "110", "101", "100", "011", "010", "001", "000"]
-    binary = format(rule_num, '08b')
+    scaffold = ("".join(tup) for tup in product("10", repeat=3))
+    binary = format(rule_num, "08b")
     return dict(zip(scaffold, binary))
 
 
