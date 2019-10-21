@@ -1,23 +1,33 @@
+==== Tim; 5 minutes
+
 Introduction
 
-What is a cellular automata
+FSM/What is a cellular automata
 
 Wolfram code
 
-Demo
+Examples
 
 Wolfram types
 
-What is universal computation?
-    Turing machine / Turing computable
-    Church-Turing thesis
+Demo
+    Show Class 1, 2, 3
+    gliders (show demo with 110 (54))
 
 How does class 3 and 4 actually differ?
     Edge of chaos
     Mesoscopic scale
-    gliders (show demo again)
     Langton's ordering parameter
     Can we know what rules are class 4 (simple recipe)
+    long transient
+    halting problem
+
+==== Hielke; 5 minutes
+
+Class 4: What is universal computation?
+    Turing machine / Turing computable
+    Church-Turing thesis
+    computation irrudicability
 
 Making the rules more complex (possible new demo)
     Show that there is more to at than just the simple automata
