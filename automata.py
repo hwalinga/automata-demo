@@ -6,15 +6,16 @@ import matplotlib.animation as animation
 import matplotlib.pyplot as plt
 import numpy as np
 
-matplotlib.use("TkAgg")
+# matplotlib.use("TkAgg")
 
 
 # define rule creator
 # Interesting ones: 30, 90, 110, 184
-def get_rule(rule_num: int) -> dict:
+def get_rule(rule_num: int):
     scaffold = ("".join(tup) for tup in product("10", repeat=3))
-    binary = format(rule_num, "08b")
-    return dict(zip(scaffold, binary))
+    # binary = format(rule_num, "08b")
+    # return dict(zip(scaffold, binary))
+    return list(scaffold)
 
 
 class Automata:
@@ -75,12 +76,12 @@ class Automata:
         windows = self._window(3)
 
         # compute update for every cell in state and concat to string
-        new_state = ",".join(
-            self.rule[np.array2string(pat, separator="")[1:-1]] for pat in windows
+        new_state = np.array(
+            self.rule[8 - (2 ** 2 * a + 2 * b + c)] for a, b, c in windows
         )
 
         # create numpy array from string resulting in new state
-        self.current_state = np.fromstring(new_state, sep=",", dtype=int)
+        self.current_state = new_state
 
     def _window(self, stride=3):
         """
