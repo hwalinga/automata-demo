@@ -4,7 +4,8 @@ import matplotlib.animation as animation
 import matplotlib.pyplot as plt
 import numpy as np
 
-matplotlib.use("TkAgg")
+
+# matplotlib.use("TkAgg")
 
 
 # define rule creator
@@ -191,7 +192,6 @@ if __name__ == "__main__":
         automaat = Automata(rule, height, width, update_rate, axs)
         anim = automaat.animate(fig, frames=None)
     plt.show()
-
 
     # class 1: code 136
     # class 2: code 73

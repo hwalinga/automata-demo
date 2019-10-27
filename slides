@@ -1,0 +1,47 @@
+==== Tim; 5 minutes
+
+Introduction
+
+FSM/What is a cellular automata
+
+Wolfram code
+
+Examples
+
+Wolfram types
+
+Demo
+    Show Class 1, 2, 3
+    gliders (show demo with 110 (54))
+
+How does class 3 and 4 actually differ?
+    Edge of chaos
+    Mesoscopic scale
+    Langton's ordering parameter
+    Can we know what rules are class 4 (simple recipe)
+    long transient
+    halting problem
+
+==== Hielke; 5 minutes
+
+Class 4: What is universal computation?
+    Turing machine / Turing computable
+    Church-Turing thesis
+    computation irrudicability
+
+Making the rules more complex (possible new demo)
+    Show that there is more to at than just the simple automata
+
+A New Kind of Science
+    Use in to explain phenomena we cannot explain now
+    Chaos Theory
+    emergence
+    life?
+
+Examples in nature
+But is life a cellular automata?
+
+Conclusion
+    Cellular automata show insight in how our mathematics/computers work
+    And can model phenomenon we cannot model now with conventional science
+    especially life
