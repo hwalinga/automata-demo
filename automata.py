@@ -1,6 +1,4 @@
 import sys
-from itertools import product
-
 import matplotlib
 import matplotlib.animation as animation
 import matplotlib.pyplot as plt
@@ -12,15 +10,15 @@ matplotlib.use("TkAgg")
 # define rule creator
 # Interesting ones: 30, 90, 110, 184
 def get_rule(rule_num: int) -> dict:
-    scaffold = ("".join(tup) for tup in product("10", repeat=3))
     binary = format(rule_num, "08b")
-    return dict(zip(scaffold, binary))
+    binary_ints = [int(x) for x in binary]
+    return dict(zip(range(7, -1, -1), binary_ints))
 
 
 class Automata:
 
     #
-    def __init__(self, rule: dict, steps: int, size: int, timestep: int):
+    def __init__(self, rule: dict, steps: int, size: int, timestep: int, ax: matplotlib.axes.SubplotBase):
         """constructor for the Automata class.
         rule:
             Rule that this CA will simulate
@@ -45,11 +43,10 @@ class Automata:
 
         # initialize data and image frame
         self.x = np.zeros((self.steps, self.size))
-        self.fig = plt.figure()
-        self.ax = self.fig.add_subplot(111)
+
+        self.ax = ax
         self.ax.get_xaxis().set_visible(False)
         self.ax.get_yaxis().set_visible(False)
-        plt.tight_layout()
 
         self.image = self.ax.imshow(
             self.x, vmin=0, vmax=1, cmap="Greys", interpolation="none"
@@ -75,12 +72,20 @@ class Automata:
         windows = self._window(3)
 
         # compute update for every cell in state and concat to string
-        new_state = ",".join(
-            self.rule[np.array2string(pat, separator="")[1:-1]] for pat in windows
-        )
+        new_state = np.zeros_like(self.current_state)
+        i = 0
+        for rule_index in windows:
+            new_state[i] = self.rule[rule_index]
+            i = i + 1
 
         # create numpy array from string resulting in new state
-        self.current_state = np.fromstring(new_state, sep=",", dtype=int)
+        self.current_state = new_state
+
+    def _bool_to_int(self, window):
+        y = 0
+        for i, j in enumerate(window):
+            y += j << i
+        return y
 
     def _window(self, stride=3):
         """
@@ -95,16 +100,16 @@ class Automata:
 
         # use rolling window to generate all subarrays.
         for index in range(len(padded) - stride + 1):
-            yield padded[index : index + stride]
+            yield self._bool_to_int(padded[index: index + stride])
 
-    def animate(self, frames=None):
+    def animate(self, fig, frames=None):
         """
         Method to create animation of the CA.
         :return: animation object containing the animation of the set rule.
         """
 
         anim = animation.FuncAnimation(
-            self.fig,
+            fig,
             self._animate,
             init_func=self._init_animator,
             interval=self.timestep,
@@ -153,17 +158,42 @@ if __name__ == "__main__":
 
     # create automata with certain rule, window height and width and update speed
     rule = get_rule(int(sys.argv[1]) if len(sys.argv) > 1 else 110)
-    automaat = Automata(rule, 512, 512, 1)
+    width = int(sys.argv[2]) if len(sys.argv) > 2 else 512
+    height = int(sys.argv[3]) if len(sys.argv) > 3 else 512
 
-    # simulate rule, specify frames to set video record duration (duration is frames/fps seconds)
-    # use None for continuous animation (video stops after certain amount of frames by default)
-    anim = automaat.animate(frames=None)
+    rows = int(sys.argv[4]) if len(sys.argv) > 4 else 1
+    cols = int(sys.argv[5]) if len(sys.argv) > 5 else 1
 
-    # functions used to save simulation to video
-    # file_location = "demo_videos/animation.mp4"
-    #
-    # Writer = animation.writers['ffmpeg']
-    # writer = Writer(fps=20, metadata=dict(artist='Tim & Hielke'), bitrate=1800)
-    #
-    # anim.save(file_location, writer)
+    update_rate = int(sys.argv[6]) if len(sys.argv) > 6 else 50
+
+    fig, axs = plt.subplots(rows, cols)
+    plt.tight_layout()
+
+    if rows * cols > 1:
+
+        # for each example, create automata with different starting condition
+        for axis in axs.flatten():
+            automaat = Automata(rule, height, width, update_rate, axis)
+
+            # simulate rule, specify frames to set video record duration (duration is frames/fps seconds)
+            # use None for continuous animation (video stops after certain amount of frames by default)
+            anim = automaat.animate(fig, frames=None)
+
+            # functions used to save simulation to video
+            # file_location = "demo_videos/animation.mp4"
+            #
+            # Writer = animation.writers['ffmpeg']
+            # writer = Writer(fps=20, metadata=dict(artist='Tim & Hielke'), bitrate=1800)
+            #
+            # anim.save(file_location, writer)
+
+    else:
+        automaat = Automata(rule, height, width, update_rate, axs)
+        anim = automaat.animate(fig, frames=None)
     plt.show()
+
+
+    # class 1: code 136
+    # class 2: code 73
+    # class 3: code 18
+    # class 4: code 110
